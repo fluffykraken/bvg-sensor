@@ -1,7 +1,7 @@
 # BVG Sensor Component for Home Assistant
 
 The BVG Sensor can be used to display real-time public transport data for the city of Berlin within the BVG (Berliner Verkehrsbetriebe) route network. 
-The sensor will show the minutes until the next departure for the configured station and direction. The provided data is in real-time and does include actual delays. If you want to customize the sensor you can use the provided sensor attributes. 
+The sensor will show the minutes until the next departure for the configured station and direction. The provided data is in real-time and does include actual delays. If you want to customize the sensor you can use the provided sensor attributes. You can also define a walking distance from your home/work, so only departures that are reachable will be shown. 
 
 During testing I found that the API frequently becomes unavailable, possibly to keep the amount of requests low. Therefore this component supports a local "cache" and saves the departure data localy. The local data is only beeing used while "offline" and is beeing refreshed when the API endpoint becomes available again. 
 
