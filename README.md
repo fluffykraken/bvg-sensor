@@ -2,6 +2,7 @@
 
 The BVG Sensor can be used to display real-time public transport data for the city of Berlin within the BVG (Berliner Verkehrsbetriebe) route network. 
 The sensor will show the minutes until the next departure for the configured station and direction. The provided data is in real-time and does include actual delays. If you want to customize the sensor you can use the provided sensor attributes. 
+
 During testing I found that the API frequently becomes unavailable, possibly to keep the amount of requests low. Therefore this component supports a local "cache" and saves the departure data localy. The local data is only beeing used while "offline" and is beeing refreshed when the API endpoint becomes available again. 
 
 This component uses the an API endpoint that provides data from the BVG HAFAS API by [Jannis Redmann](https://github.com/derhuerst/)
