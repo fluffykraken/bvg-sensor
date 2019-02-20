@@ -1,3 +1,4 @@
+# Version 0.1 - initial release
 from urllib.request import urlopen
 import json
 import pytz
