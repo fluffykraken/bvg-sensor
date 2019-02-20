@@ -149,7 +149,7 @@ class Bvgsensor(Entity):
                 source = response.read()
                 self.data = json.loads(source)
                 if self._con_state.get(CONNECTION_STATE) is CON_STATE_OFFLINE:
-                    _LOGGER.warning("Connection to BVG API re-established")
+                    _LOGGER.debug("Connection to BVG API re-established")
                     self._con_state.update({CONNECTION_STATE: CON_STATE_ONLINE})
                 # write the response to a file for caching if connection is not available, which seems to happen from time to time
                 try:
@@ -162,8 +162,8 @@ class Bvgsensor(Entity):
                     _LOGGER.error("I/O error({}): {}".format(e.errno, e.strerror))
         except URLError as e:
             if self._con_state.get(CONNECTION_STATE) is CON_STATE_ONLINE:
-                _LOGGER.warning(e)
-                _LOGGER.warning("Connection to BVG API lost, using local cache instead")
+                _LOGGER.debug(e)
+                _LOGGER.debug("Connection to BVG API lost, using local cache instead")
                 self._con_state.update({CONNECTION_STATE: CON_STATE_OFFLINE})
             self.fetchDataFromFile()
 
