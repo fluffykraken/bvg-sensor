@@ -58,7 +58,7 @@ To add the BVG Sensor Component to Home Assistant, add the following to your con
 ````
 
 - **stop_id** *(Required)*: The stop_id for your station.
-- **direction** *(Required)*: The direction you are interested in.
+- **direction** *(Required)*: One or more destinations for your route.
 - **name** *(optional)*: Name your sensor, especially if you create multiple instance of the sensor give them different names. * (Default=BVG)*
 - **walking_distance** *(optional)*: specify the walking distance in minutes from your home/location to the station. Only connections that are reachable in a timley manner will be shown. Set it to ``0`` if you want to disable this feature. *(Default=10)*
 - **file_path** *(optional)*: path where you want your station specific data to be saved. *(Default= your home assistant config directory e.g. "conf/" )*
