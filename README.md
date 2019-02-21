@@ -35,7 +35,16 @@ Your ``stop_id`` for ``"U Rosa-Luxemburg-Platz"`` would be ``"900000100016"``
 
 #### get the direction:
 
-Specify the final destination (must be a valid station name) for the connection you want to display. In this example this would be ``Gleisdreieck``. 
+Specify the final destination (must be a valid station name) for the connection you want to display. In this example this would be ``Gleisdreieck``. If your route is beeing served by multiple lines with different directions, you can define multiple destinations in your config.
+
+```yaml
+# Example configuration.yaml entry
+- platform: bvgsensor
+    stop_id: your stop id
+    direction: 
+      - "destionation 1"
+      - "destination 2"
+````
 
 # Configuration
 
