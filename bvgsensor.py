@@ -1,4 +1,7 @@
+# Version History:
 # Version 0.1 - initial release
+# Version 0.2 - added multiple destinations
+
 from urllib.request import urlopen
 import json
 import pytz
@@ -49,7 +52,7 @@ SCAN_INTERVAL = timedelta(seconds=60)
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Required(CONF_STOP_ID): cv.string,
-    vol.Required(CONF_DESTINATION): cv.string,
+    vol.Required(CONF_DESTINATION): vol.All(cv.ensure_list, [cv.string]),
     vol.Optional(CONF_MIN_DUE_IN, default=10): cv.positive_int,
     vol.Optional(CONF_CACHE_PATH, default='/'): cv.string,
     vol.Optional(CONF_NAME, default='BVG'): cv.string
@@ -179,7 +182,7 @@ class Bvgsensor(Entity):
         timetable_l = list()
         date_now = datetime.now(pytz.timezone(self.hass_config.get("time_zone")))
         for pos in self.data:
-            if direction in pos['direction']:
+            if pos['direction'] in direction:
                 dep_time = datetime.strptime(pos['when'][:-6], "%Y-%m-%dT%H:%M:%S.%f")
                 dep_time = pytz.timezone('Europe/Berlin').localize(dep_time)
                 delay = (pos['delay'] // 60) if pos['delay'] is not None else 0
