@@ -1,6 +1,6 @@
 # Version History:
 # Version 0.1 - initial release
-# Version 0.2 - added multiple destinations
+# Version 0.2 - added multiple destinations, optimized error logging
 
 from urllib.request import urlopen
 import json
@@ -74,12 +74,14 @@ class Bvgsensor(Entity):
 
     def __init__(self, name, stop_id, direction, min_due_in, file_path, hass):
         """Initialize the sensor."""
+        self._cache_size = 60
+        self._cache_creation_date = None
         self._name = name
         self._state = None
         self._stop_id = stop_id
         self.direction = direction
         self.min_due_in = min_due_in
-        self.url = "https://1.bvg.transport.rest/stations/%s/departures?duration=60" % (self._stop_id)
+        self.url = "https://1.bvg.transport.rest/stations/{}/departures?duration={}".format(self._stop_id, self._cache_size)
         self.data = None
         self.singleConnection = None
         self.hass_config = hass.config.as_dict()
@@ -160,6 +162,7 @@ class Bvgsensor(Entity):
                         # self.data = json.load(fd)
                         json.dump(self.data, fd, ensure_ascii=False)
                         # json.writes(response)
+                        self._cache_creation_date = datetime.now(pytz.timezone(self.hass_config.get("time_zone")))
                 except IOError as e:
                     _LOGGER.error("Could not write file. Please check your configuration and read/write access for path:{}".format(self.cachePath))
                     _LOGGER.error("I/O error({}): {}".format(e.errno, e.strerror))
@@ -207,6 +210,20 @@ class Bvgsensor(Entity):
             _LOGGER.debug("Valid connection found")
             return(timetable_l[int(nmbr)])
         except IndexError as e:
-            _LOGGER.warning("No valid connection found. Please check your configuration.")
-            _LOGGER.error(e)
+            if self.isCacheValid:
+                _LOGGER.warning("No valid connection found. Please check your configuration.")
+            else:
+                _LOGGER.warning("No up to date data found. API may be down for longer than {} minutes.".format(self._cache_size))
+                _LOGGER.error(e)
             return None
+
+    @property
+    def isCacheValid(self):
+        date_now = datetime.now(pytz.timezone(self.hass_config.get("time_zone")))
+        td = date_now - self._cache_creation_date
+        td = td.seconds
+        if td > (self._cache_size * 60):
+            _LOGGER.warning("Cache Age (not valid): {}".format(td // 60))
+            return False
+        else:
+            return True
