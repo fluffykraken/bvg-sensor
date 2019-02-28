@@ -5,6 +5,9 @@
 from urllib.request import urlopen
 import json
 import pytz
+# TODO DEBUG ONLY
+import os.path
+
 from datetime import datetime, timedelta
 from urllib.error import URLError
 
@@ -154,7 +157,7 @@ class Bvgsensor(Entity):
                 source = response.read()
                 self.data = json.loads(source)
                 if self._con_state.get(CONNECTION_STATE) is CON_STATE_OFFLINE:
-                    _LOGGER.debug("Connection to BVG API re-established")
+                    _LOGGER.warning("Connection to BVG API re-established")
                     self._con_state.update({CONNECTION_STATE: CON_STATE_ONLINE})
                 # write the response to a file for caching if connection is not available, which seems to happen from time to time
                 try:
@@ -169,7 +172,7 @@ class Bvgsensor(Entity):
         except URLError as e:
             if self._con_state.get(CONNECTION_STATE) is CON_STATE_ONLINE:
                 _LOGGER.debug(e)
-                _LOGGER.debug("Connection to BVG API lost, using local cache instead")
+                _LOGGER.warning("Connection to BVG API lost, using local cache instead")
                 self._con_state.update({CONNECTION_STATE: CON_STATE_OFFLINE})
             self.fetchDataFromFile()
 
@@ -184,44 +187,52 @@ class Bvgsensor(Entity):
     def getSingleConnection(self, direction, min_due_in, nmbr):
         timetable_l = list()
         date_now = datetime.now(pytz.timezone(self.hass_config.get("time_zone")))
-        for pos in self.data:
-            if pos['direction'] in direction:
-                dep_time = datetime.strptime(pos['when'][:-6], "%Y-%m-%dT%H:%M:%S.%f")
-                dep_time = pytz.timezone('Europe/Berlin').localize(dep_time)
-                delay = (pos['delay'] // 60) if pos['delay'] is not None else 0
-                departure_td = dep_time - date_now
-                # check if connection is not in the past
-                if departure_td > timedelta(days=0):
-                    departure_td = (departure_td.seconds // 60)
-                    if departure_td >= min_due_in:
-                        timetable_l.append({ATTR_DESTINATION: pos['direction'], ATTR_REAL_TIME: dep_time,
-                                            ATTR_DUE_IN: departure_td, ATTR_DELAY: delay,
-                                            ATTR_TRIP_ID: pos['trip'], ATTR_STOP_NAME: pos['stop']['name'],
-                                            ATTR_TRANS_TYPE: pos['line']['product'], ATTR_LINE_NAME: pos['line']['name']
-                                            })
-                        _LOGGER.debug("Connection found")
+        for dest in direction:
+            for pos in self.data:
+                # _LOGGER.warning("conf_direction: {} pos_direction {}".format(direction, pos['direction']))
+                # if pos['direction'] in direction:
+                if dest in pos['direction']:
+                    dep_time = datetime.strptime(pos['when'][:-6], "%Y-%m-%dT%H:%M:%S.%f")
+                    dep_time = pytz.timezone('Europe/Berlin').localize(dep_time)
+                    delay = (pos['delay'] // 60) if pos['delay'] is not None else 0
+                    departure_td = dep_time - date_now
+                    # check if connection is not in the past
+                    if departure_td > timedelta(days=0):
+                        departure_td = (departure_td.seconds // 60)
+                        if departure_td >= min_due_in:
+                            timetable_l.append({ATTR_DESTINATION: pos['direction'], ATTR_REAL_TIME: dep_time,
+                                                ATTR_DUE_IN: departure_td, ATTR_DELAY: delay,
+                                                ATTR_TRIP_ID: pos['trip'], ATTR_STOP_NAME: pos['stop']['name'],
+                                                ATTR_TRANS_TYPE: pos['line']['product'], ATTR_LINE_NAME: pos['line']['name']
+                                                })
+                            _LOGGER.debug("Connection found")
+                        else:
+                            _LOGGER.debug("Connection is due in under {} minutes".format(min_due_in))
                     else:
-                        _LOGGER.debug("Connection is due in under {} minutes".format(min_due_in))
+                        _LOGGER.debug("Connection lies in the past")
                 else:
-                    _LOGGER.debug("Connection lies in the past")
-            else:
-                _LOGGER.debug("No connection for specified direction")
-        try:
-            _LOGGER.debug("Valid connection found")
-            return(timetable_l[int(nmbr)])
-        except IndexError as e:
-            if self.isCacheValid:
-                _LOGGER.warning("No valid connection found. Please check your configuration.")
-            else:
-                _LOGGER.warning("No up to date data found. API may be down for longer than {} minutes.".format(self._cache_size))
-                _LOGGER.error(e)
-            return None
+                    _LOGGER.debug("No connection for specified direction")
+            try:
+                _LOGGER.debug("Valid connection found")
+                _LOGGER.debug("Connection: {}".format(timetable_l))
+                return(timetable_l[int(nmbr)])
+            except IndexError as e:
+                if self.isCacheValid:
+                    _LOGGER.warning("No valid connection found for sensor named {}. Please check your configuration.".format(self.name))
+                else:
+                    _LOGGER.warning("No up to date data found. API may be down for longer than {} minutes.".format(self._cache_size))
+                    _LOGGER.error(e)
+                return None
 
     @property
     def isCacheValid(self):
         date_now = datetime.now(pytz.timezone(self.hass_config.get("time_zone")))
-        td = date_now - self._cache_creation_date
+        # If there is no connection right from the start
+        if self._cache_creation_date is None:
+            self._cache_creation_date = os.path.getmtime("{}{}".format(self.file_path, self.file_name))
+        td = self._cache_creation_date - date_now
         td = td.seconds
+        _LOGGER.warning("td is: {}".format(td))
         if td > (self._cache_size * 60):
             _LOGGER.warning("Cache Age (not valid): {}".format(td // 60))
             return False
