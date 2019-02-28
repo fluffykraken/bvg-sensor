@@ -2,6 +2,7 @@
 # Version 0.1 - initial release
 # Version 0.2 - added multiple destinations, optimized error logging
 # Version 0.3 fixed encoding, simplified config for direction
+# Version 0.3.1 fixed a bug when departure is null
 
 from urllib.request import urlopen
 import json
@@ -193,6 +194,8 @@ class Bvgsensor(Entity):
                 # _LOGGER.warning("conf_direction: {} pos_direction {}".format(direction, pos['direction']))
                 # if pos['direction'] in direction:
                 if dest in pos['direction']:
+                    if pos['when'] is None:
+                        continue
                     dep_time = datetime.strptime(pos['when'][:-6], "%Y-%m-%dT%H:%M:%S.%f")
                     dep_time = pytz.timezone('Europe/Berlin').localize(dep_time)
                     delay = (pos['delay'] // 60) if pos['delay'] is not None else 0
