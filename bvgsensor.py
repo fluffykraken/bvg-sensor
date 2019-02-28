@@ -1,6 +1,7 @@
 # Version History:
 # Version 0.1 - initial release
 # Version 0.2 - added multiple destinations, optimized error logging
+# Version 0.3 fixed encoding, simplified config for direction
 
 from urllib.request import urlopen
 import json
@@ -232,9 +233,9 @@ class Bvgsensor(Entity):
             self._cache_creation_date = os.path.getmtime("{}{}".format(self.file_path, self.file_name))
         td = self._cache_creation_date - date_now
         td = td.seconds
-        _LOGGER.warning("td is: {}".format(td))
+        _LOGGER.debug("td is: {}".format(td))
         if td > (self._cache_size * 60):
-            _LOGGER.warning("Cache Age (not valid): {}".format(td // 60))
+            _LOGGER.debug("Cache Age (not valid): {}".format(td // 60))
             return False
         else:
             return True
