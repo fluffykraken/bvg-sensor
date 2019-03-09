@@ -19,7 +19,7 @@ To find your ``stop_id`` use the following link: https://1.bvg.transport.rest/st
 Find your `stop_id` within the json repsonse in your browser. 
 
 ### Example:
-You want to display the departure times from "U Rosa-Luxemburg-Platz" in direction to "Gleisdreieck"
+You want to display the departure times from "U Rosa-Luxemburg-Platz" in direction to "Pankow"
 
 #### get the stop_id:
 
@@ -35,7 +35,7 @@ Your ``stop_id`` for ``"U Rosa-Luxemburg-Platz"`` would be ``"900000100016"``
 
 #### get the direction:
 
-Specify the final destination (must be a valid station name) for the connection you want to display. In this example this would be ``Gleisdreieck``. If your route is beeing served by multiple lines with different directions, you can define multiple destinations in your config.
+Specify the final destination (must be a valid station name) for the connection you want to display. In this example this would be ``Pankow``. If your route is beeing served by multiple lines with different directions, you can define multiple destinations in your config.
 
 ```yaml
 # Example configuration.yaml entry
@@ -69,7 +69,7 @@ sensor:
   - platform: bvgsensor
     name: U2 Rosa-Luxemburg-Platz
     stop_id: "900000100016"
-    direction: "Gleisdreieck"
+    direction: "Pankow"
     walking_distance: 5
     file_path: "/tmp/"
 ```
