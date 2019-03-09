@@ -9,6 +9,8 @@ This component uses the API endpoint that provides data from the BVG HAFAS API b
 
 # Installation
 
+**Only valid for HomeAssistant Version lower than 0.89 as there were some breaking changes on how custom components will integrate with HomeAssistant from Version 0.89 and beyond...**
+
 Simply copy the file bvgsensor.py into your ``/config/custom_components/sensor/`` folder. If it does not already exist, create the missing folders.
 
 # Prerequisites
