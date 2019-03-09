@@ -3,6 +3,7 @@
 # Version 0.2 - added multiple destinations, optimized error logging
 # Version 0.3 fixed encoding, simplified config for direction
 # Version 0.3.1 fixed a bug when departure is null
+# Version 0.3.2 bufix for TypeError
 
 from urllib.request import urlopen
 import json
@@ -233,7 +234,7 @@ class Bvgsensor(Entity):
         date_now = datetime.now(pytz.timezone(self.hass_config.get("time_zone")))
         # If there is no connection right from the start
         if self._cache_creation_date is None:
-            self._cache_creation_date = os.path.getmtime("{}{}".format(self.file_path, self.file_name))
+            self._cache_creation_date = datetime.fromtimestamp(os.path.getmtime("{}{}".format(self.file_path, self.file_name)))
         td = self._cache_creation_date - date_now
         td = td.seconds
         _LOGGER.debug("td is: {}".format(td))
