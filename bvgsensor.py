@@ -4,11 +4,12 @@
 # Version 0.3 fixed encoding, simplified config for direction
 # Version 0.3.1 fixed a bug when departure is null
 # Version 0.3.2 bufix for TypeError
+# Version 0.3.3 switched to timezone aware objects, cache_size added to config parameters, optimized logging
 
 from urllib.request import urlopen
 import json
 import pytz
-# TODO DEBUG ONLY
+
 import os.path
 
 from datetime import datetime, timedelta
@@ -31,12 +32,14 @@ ATTR_DESTINATION = 'direction'
 ATTR_TRANS_TYPE = 'type'
 ATTR_TRIP_ID = 'trip'
 ATTR_LINE_NAME = 'line_name'
+ATTR_CONNECTION_STATE = 'connection_status'
 
 CONF_NAME = 'name'
 CONF_STOP_ID = 'stop_id'
 CONF_DESTINATION = 'direction'
 CONF_MIN_DUE_IN = 'walking_distance'
 CONF_CACHE_PATH = 'file_path'
+CONF_CACHE_SIZE = 'cache_size'
 
 CONNECTION_STATE = 'connection_state'
 CON_STATE_ONLINE = 'online'
@@ -61,7 +64,8 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Required(CONF_DESTINATION): vol.All(cv.ensure_list, [cv.string]),
     vol.Optional(CONF_MIN_DUE_IN, default=10): cv.positive_int,
     vol.Optional(CONF_CACHE_PATH, default='/'): cv.string,
-    vol.Optional(CONF_NAME, default='BVG'): cv.string
+    vol.Optional(CONF_NAME, default='BVG'): cv.string,
+    vol.Optional(CONF_CACHE_SIZE, default=90): cv.positive_int,
 })
 
 
@@ -72,16 +76,20 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     min_due_in = config.get(CONF_MIN_DUE_IN)
     file_path = config.get(CONF_CACHE_PATH)
     name = config.get(CONF_NAME)
-    add_entities([Bvgsensor(name, stop_id, direction, min_due_in, file_path, hass)])
+    cache_size = config.get(CONF_CACHE_SIZE)
+    add_entities([Bvgsensor(name, stop_id, direction, min_due_in, file_path, hass, cache_size)])
 
 
 class Bvgsensor(Entity):
     """Representation of a Sensor."""
 
-    def __init__(self, name, stop_id, direction, min_due_in, file_path, hass):
+    def __init__(self, name, stop_id, direction, min_due_in, file_path, hass, cache_size):
         """Initialize the sensor."""
-        self._cache_size = 60
+        self.hass_config = hass.config.as_dict()
+        self._cache_size = cache_size
         self._cache_creation_date = None
+        self._isCacheValid = True
+        self._timezone = self.hass_config.get("time_zone")
         self._name = name
         self._state = None
         self._stop_id = stop_id
@@ -90,7 +98,6 @@ class Bvgsensor(Entity):
         self.url = "https://1.bvg.transport.rest/stations/{}/departures?duration={}".format(self._stop_id, self._cache_size)
         self.data = None
         self.singleConnection = None
-        self.hass_config = hass.config.as_dict()
         self.file_path = self.hass_config.get("config_dir") + file_path
         self.file_name = "bvg_{}.json".format(stop_id)
         self._con_state = {CONNECTION_STATE: CON_STATE_ONLINE}
@@ -168,7 +175,7 @@ class Bvgsensor(Entity):
                         # self.data = json.load(fd)
                         json.dump(self.data, fd, ensure_ascii=False)
                         # json.writes(response)
-                        self._cache_creation_date = datetime.now(pytz.timezone(self.hass_config.get("time_zone")))
+                        self._cache_creation_date = datetime.now(pytz.timezone(self._timezone))
                 except IOError as e:
                     _LOGGER.error("Could not write file. Please check your configuration and read/write access for path:{}".format(self.cachePath))
                     _LOGGER.error("I/O error({}): {}".format(e.errno, e.strerror))
@@ -222,19 +229,21 @@ class Bvgsensor(Entity):
                 _LOGGER.debug("Connection: {}".format(timetable_l))
                 return(timetable_l[int(nmbr)])
             except IndexError as e:
-                if self.isCacheValid:
+                if self.isCacheValid():
                     _LOGGER.warning("No valid connection found for sensor named {}. Please check your configuration.".format(self.name))
+                    self._isCacheValid = True
                 else:
-                    _LOGGER.warning("No up to date data found. API may be down for longer than {} minutes.".format(self._cache_size))
-                    _LOGGER.error(e)
+                    if self._isCacheValid:
+                        _LOGGER.warning("Cache is outdated.")
+                    self._isCacheValid = False
+                    # _LOGGER.error(e)
                 return None
 
-    @property
     def isCacheValid(self):
         date_now = datetime.now(pytz.timezone(self.hass_config.get("time_zone")))
-        # If there is no connection right from the start
+        # If the component is starting without internet connection
         if self._cache_creation_date is None:
-            self._cache_creation_date = datetime.fromtimestamp(os.path.getmtime("{}{}".format(self.file_path, self.file_name)))
+            self._cache_creation_date = datetime.fromtimestamp(os.path.getmtime("{}{}".format(self.file_path, self.file_name)), pytz.timezone(self._timezone))
         td = self._cache_creation_date - date_now
         td = td.seconds
         _LOGGER.debug("td is: {}".format(td))
