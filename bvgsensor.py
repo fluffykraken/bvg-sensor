@@ -164,7 +164,7 @@ class Bvgsensor(Entity):
     def fetchDataFromURL(self):
         try:
             with urlopen(self.url) as response:
-                source = response.read()
+                source = response.read().decode('utf8')
                 self.data = json.loads(source)
                 if self._con_state.get(CONNECTION_STATE) is CON_STATE_OFFLINE:
                     _LOGGER.warning("Connection to BVG API re-established")
