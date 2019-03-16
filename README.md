@@ -7,7 +7,7 @@ During testing I found that the API frequently becomes unavailable, possibly to 
 
 You can check the status of the API Endpoint here: https://status.transport.rest/781627008
 
-This component uses the API endpoint that provides data from the BVG HAFAS API by [Jannis Redmann](https://github.com/derhuerst/)
+This component uses the API endpoint that provides data from the BVG HAFAS API by [Jannis Redmann](https://github.com/derhuerst/).
 Without his fantastic work, this component would not possible!
 
 # Installation
