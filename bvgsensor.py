@@ -177,7 +177,7 @@ class Bvgsensor(Entity):
                         # json.writes(response)
                         self._cache_creation_date = datetime.now(pytz.timezone(self._timezone))
                 except IOError as e:
-                    _LOGGER.error("Could not write file. Please check your configuration and read/write access for path:{}".format(self.cachePath))
+                    _LOGGER.error("Could not write file. Please check your configuration and read/write access for path:{}".format(self.file_path))
                     _LOGGER.error("I/O error({}): {}".format(e.errno, e.strerror))
         except URLError as e:
             if self._con_state.get(CONNECTION_STATE) is CON_STATE_ONLINE:
@@ -191,7 +191,7 @@ class Bvgsensor(Entity):
             with open("{}{}".format(self.file_path, self.file_name), 'r') as fd:
                 self.data = json.load(fd)
         except IOError as e:
-            _LOGGER.error("Could not read file. Please check your configuration and read/write access for path: {}".format(self.cachePath))
+            _LOGGER.error("Could not read file. Please check your configuration and read/write access for path: {}".format(self.file_path))
             _LOGGER.error("I/O error({}): {}".format(e.errno, e.strerror))
 
     def getSingleConnection(self, direction, min_due_in, nmbr):
