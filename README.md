@@ -5,24 +5,24 @@ The sensor will display the minutes until the next departure for the configured 
 
 During testing I found that the API frequently becomes unavailable, possibly to keep the amount of requests low. Therefore this component keeps a local copy of the data (90 minutes). The local data is only beeing used while "offline" and is beeing refreshed when the API endpoint becomes available again. 
 
-You can check the status of the API Endpoint here: https://status.transport.rest/781627008
+You can check the status of the API Endpoint here: https://status.transport.rest/782652585
 
 This component uses the API endpoint that provides data from the BVG HAFAS API by [Jannis Redmann](https://github.com/derhuerst/).
 Without his fantastic work, this component would not possible!
 
 # Installation
 
-If you are using HomeAssitant Version 0.89 and beyond, simply copy the file bvgsensor.py into your ``/config/custom_components/bvgsensor/`` folder and rename it to ``sensor.py``. If it does not already exist, create the missing folders.
+If you are using HomeAssitant Version 0.89 and beyond, simply copy the file sensor.py into your ``/config/custom_components/bvgsensor/`` folder. If it does not already exist, create the missing folders.
 
 **Only valid for HomeAssistant Version lower than 0.89 as there were some breaking changes on how custom components will integrate with HomeAssistant from Version 0.89 and beyond...**
 
-Simply copy the file bvgsensor.py into your ``/config/custom_components/sensor/`` folder. If it does not already exist, create the missing folders.
+Simply copy the file sensor.py into your ``/config/custom_components/sensor/`` folder and rename it to `bvgsensor.py`. If it does not already exist, create the missing folders.
 
 # Prerequisites
 
 You will need to specify at least a ``stop_id`` and a ``direction`` for the connection you would like to display.
 
-To find your ``stop_id`` use the following link: https://1.bvg.transport.rest/stations/nearby?latitude=52.52725&longitude=13.4123 and replace the values for ```latitude=``` and ```longitude=``` with your coordinates. You can get those e.g. from Google Maps.
+To find your ``stop_id`` use the following link: https://2.bvg.transport.rest/stops/nearby?latitude=52.52725&longitude=13.4123 and replace the values for ```latitude=``` and ```longitude=``` with your coordinates. You can get those e.g. from Google Maps.
 Find your `stop_id` within the json repsonse in your browser. 
 
 ### Example:
