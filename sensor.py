@@ -96,7 +96,7 @@ class Bvgsensor(Entity):
         self._stop_id = stop_id
         self.direction = direction
         self.min_due_in = min_due_in
-        self.url = "https://1.bvg.transport.rest/stations/{}/departures?duration={}".format(self._stop_id, self._cache_size)
+        self.url = "https://2.bvg.transport.rest/stations/{}/departures?duration={}".format(self._stop_id, self._cache_size)
         self.data = None
         self.singleConnection = None
         self.file_path = self.hass_config.get("config_dir") + file_path
@@ -205,7 +205,7 @@ class Bvgsensor(Entity):
                 if dest in pos['direction']:
                     if pos['when'] is None:
                         continue
-                    dep_time = datetime.strptime(pos['when'][:-6], "%Y-%m-%dT%H:%M:%S.%f")
+                    dep_time = datetime.strptime(pos['when'][:-6], "%Y-%m-%dT%H:%M:%S")
                     dep_time = pytz.timezone('Europe/Berlin').localize(dep_time)
                     delay = (pos['delay'] // 60) if pos['delay'] is not None else 0
                     departure_td = dep_time - date_now
@@ -215,7 +215,7 @@ class Bvgsensor(Entity):
                         if departure_td >= min_due_in:
                             timetable_l.append({ATTR_DESTINATION: pos['direction'], ATTR_REAL_TIME: dep_time,
                                                 ATTR_DUE_IN: departure_td, ATTR_DELAY: delay,
-                                                ATTR_TRIP_ID: pos['trip'], ATTR_STOP_NAME: pos['stop']['name'],
+                                                ATTR_TRIP_ID: pos['tripId'], ATTR_STOP_NAME: pos['stop']['name'],
                                                 ATTR_TRANS_TYPE: pos['line']['product'], ATTR_LINE_NAME: pos['line']['name']
                                                 })
                             _LOGGER.debug("Connection found")
