@@ -96,7 +96,7 @@ class Bvgsensor(Entity):
         self._stop_id = stop_id
         self.direction = direction
         self.min_due_in = min_due_in
-        self.url = "https://2.bvg.transport.rest/stations/{}/departures?duration={}".format(self._stop_id, self._cache_size)
+        self.url = "https://v5.bvg.transport.rest/stops/{}/departures?duration={}".format(self._stop_id, self._cache_size)
         self.data = None
         self.singleConnection = None
         self.file_path = self.hass_config.get("config_dir") + file_path

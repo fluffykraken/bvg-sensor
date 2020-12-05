@@ -22,7 +22,7 @@ Simply copy the file sensor.py into your ``/config/custom_components/sensor/`` f
 
 You will need to specify at least a ``stop_id`` and a ``direction`` for the connection you would like to display.
 
-To find your ``stop_id`` use the following link: https://2.bvg.transport.rest/stops/nearby?latitude=52.52725&longitude=13.4123 and replace the values for ```latitude=``` and ```longitude=``` with your coordinates. You can get those e.g. from Google Maps.
+To find your ``stop_id`` use the following link: https://v5.bvg.transport.rest/stops/nearby?latitude=52.52725&longitude=13.4123 and replace the values for ```latitude=``` and ```longitude=``` with your coordinates. You can get those e.g. from Google Maps.
 Find your `stop_id` within the json repsonse in your browser. 
 
 ### Example:
@@ -30,11 +30,11 @@ You want to display the departure times from "U Rosa-Luxemburg-Platz" in directi
 
 #### get the stop_id:
 
-Link: https://1.bvg.transport.rest/stations/nearby?latitude=52.52725&longitude=13.4123
+Link: https://v5.bvg.transport.rest/stops/nearby?latitude=52.52725&longitude=13.4123
 
 ``
 
-{"type":"stop","id":"900000100016","name":"U Rosa-Luxemburg-Platz","location":{"type":"location","latitude":52.528187,"longitude":13.410405},"products":{"suburban":false,"subway":true,"tram":true,"bus":true,"ferry":false,"express":false,"regional":false},"distance":165}
+{"type":"stop","id":"900000100016","name":"U Rosa-Luxemburg-Platz","location":{"type":"location","id":"900100016","latitude":52.528187,"longitude":13.410405},"products":{"suburban":false,"subway":true,"tram":true,"bus":true,"ferry":false,"express":false,"regional":false},"distance":165}
 
 ``
 
