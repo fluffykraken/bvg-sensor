@@ -1,8 +1,8 @@
 {
   "domain": "bvg",
-  "name": "BVG Berlin public transport sensor integration",
-  "documentation": "https://github.com/disrupted/bvg-sensor",
+  "name": "BVG Berlin public transportation sensor integration",
+  "documentation": "https://github.com/seurat-atreides/bvg-sensor",
   "requirements": [],
   "dependencies": [],
-  "codeowners": ["@fluffykraken", "@disrupted"]
+  "codeowners": ["@disrupted", "@seurat-atreides"]
 }
