@@ -1,6 +1,8 @@
 # BVG Sensor Component for Home Assistant
-**NOTE: this fork is Work-In-Progress because it's not functional under HassIO ver. 2020.12.07!**
-
+**NOTE: this fork is Work-In-Progress because it's not functional under HassIO ver. 2020.12.07!<br>
+        The 1.bvg.transport.rest API has been deprecated and this sensor has to be modified to<br>
+        use the newer v5.bvg.transport.rest API**
+ 
 The BVG Sensor can be used to display real-time public transport data for the city of Berlin within the BVG (Berliner Verkehrsbetriebe) route network. 
 The sensor will display the minutes until the next departure for the configured station and direction. The provided data is in real-time and does include actual delays. If you want to customize the sensor you can use the provided sensor attributes. You can also define a walking distance from your home/work, so only departures that are reachable will be shown. 
 
@@ -8,8 +10,7 @@ During testing I found that the API frequently becomes unavailable, possibly to 
 
 You can check the status of the API Endpoint here: https://status.transport.rest/784879513
 
-This component uses the API endpoint that provides data from the BVG HAFAS API by [Jannis Redmann](https://github.com/derhuerst/).
-Without his fantastic work, this component would not possible!
+This component uses the API provided by the [v5.bvg.transport.rest](https://v5.bvg.transport.rest/).
 
 # Installation
 
