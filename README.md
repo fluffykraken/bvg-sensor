@@ -5,7 +5,7 @@ The sensor will display the minutes until the next departure for the configured 
 
 During testing I found that the API frequently becomes unavailable, possibly to keep the amount of requests low. Therefore this component keeps a local copy of the data (90 minutes). The local data is only beeing used while "offline" and is beeing refreshed when the API endpoint becomes available again. 
 
-You can check the status of the API Endpoint here: https://status.transport.rest/781627008
+You can check the status of the API Endpoint here: https://status.transport.rest/784879513
 
 This component uses the API endpoint that provides data from the BVG HAFAS API by [Jannis Redmann](https://github.com/derhuerst/).
 Without his fantastic work, this component would not possible!
